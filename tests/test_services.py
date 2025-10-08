@@ -1,9 +1,15 @@
 import json
+import os
 import logging
 import pytest
 
 from src.services import investment_bank, simple_search
 from unittest.mock import patch
+
+# Проверяем, есть ли папка logs — если нет, создаём
+os.makedirs("logs", exist_ok=True)
+
+file_handler = logging.FileHandler("logs/utils.log", mode="w", encoding="utf-8")
 
 
 @pytest.mark.parametrize(
