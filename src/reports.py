@@ -9,11 +9,6 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def spending_by_category(transactions: pd.DataFrame, category: str) -> float:
-    df = transactions[transactions["Категория"] == category]
-    return float(df["Сумма операции"].sum())
-
-
 def save_report(filename: Optional[str] = None):
     """
     Декоратор для сохранения результата функции-отчета в файл.
