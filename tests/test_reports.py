@@ -8,6 +8,21 @@ from src.reports import save_report, spending_by_category
 
 
 @pytest.fixture
+def fake_df():
+    data = {
+        "Категория": ["Еда", "Еда", "Транспорт", "Еда"],
+        "Сумма операции": [100, 50, 200, 150],
+    }
+    return pd.DataFrame(data)
+
+
+def test_spending_by_category(fake_df):
+    from src.reports import spending_by_category
+    total = spending_by_category(fake_df, "Еда")
+    assert total == 300
+
+
+@pytest.fixture
 def sample_transactions():
     data = {
         "Дата операции": ["2025-07-01", "2025-08-15", "2025-09-10", "2025-09-20"],
