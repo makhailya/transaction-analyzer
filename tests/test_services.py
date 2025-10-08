@@ -6,6 +6,19 @@ from src.services import investment_bank, simple_search
 from unittest.mock import patch
 
 
+@pytest.mark.parametrize(
+    "transactions,limit,expected",
+    [
+        ([{"Дата операции": "2025-10-01", "Сумма операции": 1712}], 50, 38),  # округление до 1750
+        ([{"Дата операции": "2025-10-01", "Сумма операции": 134}], 10, 6),    # округление до 140
+        ([{"Дата операции": "2025-10-01", "Сумма операции": 120}], 50, 30),   # округление до 150
+    ],
+)
+def test_investment_bank(transactions, limit, expected):
+    result = investment_bank("2025-10", transactions, limit)
+    assert result == expected
+
+
 @patch("src.services.requests.get")
 def test_get_currency_rate(mock_get):
     mock_response = mock_get.return_value
