@@ -1,10 +1,17 @@
 import json
 import logging
+import requests
 from datetime import datetime
 from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+
+
+def get_currency_rate(currency: str) -> float:
+    response = requests.get(f"https://api.exchangerate.host/latest?base={currency}&symbols=RUB")
+    data = response.json()
+    return data["rates"]["RUB"]
 
 
 def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) -> str:

@@ -1,9 +1,23 @@
 import json
 import logging
-
 import pytest
 
 from src.services import investment_bank, simple_search
+from unittest.mock import patch
+
+
+@patch("src.services.requests.get")
+def test_get_currency_rate(mock_get):
+    mock_response = mock_get.return_value
+    mock_response.json.return_value = {
+        "rates": {"RUB": 97.5}
+    }
+
+    from src.services import get_currency_rate
+    rate = get_currency_rate("USD")
+
+    assert rate == 97.5
+    mock_get.assert_called_once()
 
 
 @pytest.fixture
