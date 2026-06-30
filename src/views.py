@@ -1,12 +1,10 @@
-# src/views.py
 import json
 import logging
 from datetime import datetime
 from typing import Any, Dict
-
 import pandas as pd
-
 from src.utils import get_currency_rates, get_stock_prices
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +29,9 @@ def main_page(date_str: str, transactions: pd.DataFrame, settings: Dict[str, Any
     Формирует JSON-ответ для страницы "Главная".
 
     Args:
-        date_str (str): Дата и время в формате "YYYY-MM-DD HH:MM:SS".
+        date_str (str): Дата и время в формате "YYYY-MM-DD HH:MM:SS"
         transactions (pd.DataFrame): Датафрейм с транзакциями.
-        settings (dict): настройки с валютами и акциями (из user_settings.json).
+        settings (dict): Настройки с валютами и акциями (из user_settings.json).
 
     Returns:
         str: JSON-строка с данными для веб-страницы.

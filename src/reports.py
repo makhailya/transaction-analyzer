@@ -2,21 +2,21 @@ import json
 import logging
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
 
-def save_report(filename: Optional[str] = None):
+def save_report(filename: Optional[str] = None) -> Callable:
     """
     Декоратор для сохранения результата функции-отчета в файл.
-    Если имя файла не передано, используется имя по умолчанию reports_<date>.json
+    Если имя файла не передано, используется имя по умолчанию `reports_<date>.json`
     """
-    def decorator(func: Callable):
+    def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             result = func(*args, **kwargs)
 
             file_to_save = filename or f"reports_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
@@ -31,7 +31,7 @@ def save_report(filename: Optional[str] = None):
     return decorator
 
 
-@save_report()  # По умолчанию будет писать в reports_<date>.json
+@save_report()  # По умолчанию будет писать в `reports_<date>.json`
 def spending_by_category(transactions: pd.DataFrame,
                          category: str,
                          date: Optional[str] = None) -> str:

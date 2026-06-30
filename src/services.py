@@ -10,24 +10,23 @@ logging.basicConfig(level=logging.DEBUG)
 
 def get_currency_rate(currency: str) -> float:
     response = requests.get(f"https://api.exchangerate.host/latest?base={currency}&symbols=RUB")
-    data = response.json()
-    return data["rates"]["RUB"]
+    data: dict = response.json()
+    return float(data["rates"]["RUB"])
 
 
 def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) -> str:
     """
-    Рассчитывает сумму, которую можно накопить в 'Инвесткопилке'
-    за заданный месяц.
+    Рассчитывает сумму, которую можно накопить в 'Инвесткопилке' за заданный месяц.
 
-    :param month: месяц в формате "YYYY-MM"
-    :param transactions: список транзакций (каждая транзакция — словарь)
-    :param limit: предел округления (например, 10, 50 или 100 ₽)
+    :param month: Месяц в формате "YYYY-MM"
+    :param transactions: Список транзакций (каждая транзакция — словарь)
+    :param limit: Предел округления (например, 10, 50 или 100 ₽)
     :return: JSON-строка с результатом {"month": "...", "saved": ...}
     """
     saved_amount = 0.0
     for t in transactions:
-        date_str = t.get("Дата операции")
-        amount = t.get("Сумма операции")
+        date_str: str | None = t.get("Дата операции")
+        amount: Any | None = t.get("Сумма операции")
 
         if not date_str or not amount:
             continue
@@ -46,7 +45,7 @@ def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) 
             saved_amount += rounded - amount
 
     result = {"month": month, "saved": round(saved_amount, 2)}
-    logger.debug("Инвесткопилка: %s", result)
+    logger.debug("Инвесткопилка: %s", result)  # noqa: E501
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
@@ -55,8 +54,8 @@ def simple_search(query: str, transactions: List[Dict[str, Any]]) -> str:
     Ищет транзакции, где query встречается в описании или категории.
 
     Args:
-        query (str): строка для поиска
-        transactions (list[dict]): список транзакций
+        query (str): Строка для поиска
+        transactions (list[dict]): Список транзакций
 
     Returns:
         str: JSON со списком найденных транзакций

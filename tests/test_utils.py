@@ -1,7 +1,9 @@
+from pathlib import Path
+
 from src.utils import read_transactions
 
 
-def test_read_transactions_valid(tmp_path):
+def test_read_transactions_valid(tmp_path: Path) -> None:
     file = tmp_path / "test.json"
     file.write_text('[{"id": 1, "state": "EXECUTED"}]', encoding="utf-8")
 
@@ -9,7 +11,7 @@ def test_read_transactions_valid(tmp_path):
     assert result == [{"id": 1, "state": "EXECUTED"}]
 
 
-def test_read_transactions_invalid(tmp_path):
+def test_read_transactions_invalid(tmp_path: Path) -> None:
     file = tmp_path / "test.json"
     file.write_text('{"id": 1}', encoding="utf-8")  # не список
 
@@ -17,6 +19,6 @@ def test_read_transactions_invalid(tmp_path):
     assert result == []
 
 
-def test_read_transactions_missing():
+def test_read_transactions_missing() -> None:
     result = read_transactions("no_such_file.json")
     assert result == []

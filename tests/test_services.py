@@ -4,7 +4,7 @@ import logging
 import pytest
 
 from src.services import investment_bank, simple_search
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 # Проверяем, есть ли папка logs — если нет, создаём
 os.makedirs("logs", exist_ok=True)
@@ -20,13 +20,13 @@ file_handler = logging.FileHandler("logs/utils.log", mode="w", encoding="utf-8")
         ([{"Дата операции": "2025-10-01", "Сумма операции": 120}], 50, 30),   # округление до 150
     ],
 )
-def test_investment_bank(transactions, limit, expected):
-    result = investment_bank("2025-10", transactions, limit)
-    assert result == expected
+def test_investment_bank(transactions: list[dict], limit: int, expected: float) -> None:
+    result = json.loads(investment_bank("2025-10", transactions, limit))
+    assert result["saved"] == expected
 
 
 @patch("src.services.requests.get")
-def test_get_currency_rate(mock_get):
+def test_get_currency_rate(mock_get: MagicMock) -> None:
     mock_response = mock_get.return_value
     mock_response.json.return_value = {
         "rates": {"RUB": 97.5}
@@ -40,7 +40,7 @@ def test_get_currency_rate(mock_get):
 
 
 @pytest.fixture
-def sample_transactions():
+def sample_transactions() -> list:
     return [
         {"Дата операции": "2025-09-10", "Сумма операции": 1712},
         {"Дата операции": "2025-09-15", "Сумма операции": 243},   # округление от 243
@@ -50,7 +50,7 @@ def sample_transactions():
     ]
 
 
-def test_investment_bank_basic(sample_transactions):
+def test_investment_bank_basic(sample_transactions: list) -> None:
     result = investment_bank("2025-09", sample_transactions, 50)
     data = json.loads(result)
 
@@ -63,7 +63,7 @@ def test_investment_bank_basic(sample_transactions):
     assert pytest.approx(data["saved"], 0.01) == 45.5
 
 
-def test_investment_bank_different_limit(sample_transactions):
+def test_investment_bank_different_limit(sample_transactions: list) -> None:
     result = investment_bank("2025-09", sample_transactions, 100)
     data = json.loads(result)
 
@@ -74,7 +74,7 @@ def test_investment_bank_different_limit(sample_transactions):
     assert pytest.approx(data["saved"], 0.01) == 145.5
 
 
-def test_investment_bank_no_transactions():
+def test_investment_bank_no_transactions() -> None:
     result = investment_bank("2025-07", [], 50)
     data = json.loads(result)
 
@@ -82,7 +82,7 @@ def test_investment_bank_no_transactions():
     assert data["saved"] == 0.0
 
 
-def test_investment_bank_logs_error(sample_transactions, caplog):
+def test_investment_bank_logs_error(sample_transactions: list, caplog: pytest.LogCaptureFixture) -> None:
     with caplog.at_level(logging.ERROR):
         investment_bank("2025-09", sample_transactions, 50)
 
@@ -92,7 +92,7 @@ def test_investment_bank_logs_error(sample_transactions, caplog):
 
 
 @pytest.fixture
-def sample_transactions_search():
+def sample_transactions_search() -> list:
     return [
         {"Дата операции": "2025-09-01", "Категория": "Супермаркеты", "Описание": "Лента"},
         {"Дата операции": "2025-09-05", "Категория": "Фастфуд", "Описание": "Макдональдс"},
@@ -101,7 +101,7 @@ def sample_transactions_search():
     ]
 
 
-def test_simple_search_by_category(sample_transactions_search):
+def test_simple_search_by_category(sample_transactions_search: list) -> None:
     result = simple_search("Супермаркеты", sample_transactions_search)
     data = json.loads(result)
 
@@ -109,7 +109,7 @@ def test_simple_search_by_category(sample_transactions_search):
     assert data[0]["Описание"] == "Лента"
 
 
-def test_simple_search_by_description(sample_transactions_search):
+def test_simple_search_by_description(sample_transactions_search: list) -> None:
     result = simple_search("кино", sample_transactions_search)  # проверка нечувствительности к регистру
     data = json.loads(result)
 
@@ -117,14 +117,16 @@ def test_simple_search_by_description(sample_transactions_search):
     assert data[0]["Категория"] == "Развлечения"
 
 
-def test_simple_search_no_results(sample_transactions_search):
+def test_simple_search_no_results(sample_transactions_search: list) -> None:
     result = simple_search("Аптека", sample_transactions_search)
     data = json.loads(result)
 
     assert data == []
 
 
-def test_simple_search_empty_query_logs_warning(sample_transactions_search, caplog):
+def test_simple_search_empty_query_logs_warning(
+    sample_transactions_search: list, caplog: pytest.LogCaptureFixture
+) -> None:
     with caplog.at_level(logging.WARNING):
         result = simple_search("", sample_transactions_search)
 
